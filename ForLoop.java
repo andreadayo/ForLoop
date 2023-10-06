@@ -7,4 +7,20 @@ public class ForLoop {
           System.out.println("Hello World");
         }
     }
+    
+    //natalia
+    public String[] tokenizer(String[] a){
+      String [] b = {"1", "2"};
+      return b; //this is just for refresher
+    }
+    //natalia
+    public boolean print(String[] a){
+      return true;
+    }
+    //natalia
+    public boolean update(String[] a){
+      return true;
+    }
+
 }
+
