@@ -8,7 +8,7 @@ public class ForLoop {
           System.out.println("Hello World");
           System.out.println("Hello World");
         }*/
-        String a = "Hello there. Nice to see ya.";
+        String a = "for ( int i=1 ; i<length ; ++i ) {    }";
         String[] test=tokenizer(a);
         System.out.println(Arrays.toString(test));
     }
@@ -18,7 +18,9 @@ public class ForLoop {
       a.trim();
       String[] b= a.split(" "); 
       for(int i=0; i<b.length; i++){
-        
+        if((b[i].charAt(0)=='+' && b[i].charAt(1)=='+' && b[i].charAt(2).isChar)||() ){//gonna continue later
+
+        }
       }
       return b; //this is just for refresher
     }
