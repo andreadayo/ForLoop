@@ -8,7 +8,7 @@ public class ForLoop {
           System.out.println("Hello World");
           System.out.println("Hello World");
         }*/
-        String a = "for ( int i=1 ; i < length ; ++i ) { a+=0; ++g }";
+        String a = "for ( int i=1 ; i < length ; ++i ) { a+=0 0 ; ++g ; g-- ; --g ; g++; System.out.print ( 'hello' ) }";
         String[] b= a.split(" "); 
         System.out.println(Arrays.toString(b));
         String[] test=tokenizer(a);
@@ -18,9 +18,40 @@ public class ForLoop {
     //natalia
     public static String[] tokenizer(String a){
       a.trim();
+      a.replace(" ", "");
       String[] b= a.split(" "); 
       for(int i=0; i<b.length; i++){
-        if(b[i].contains("+")||
+        try{
+        if(b[i].contains("=") && Character.isAlphabetic(b[i].charAt(b[i].indexOf("=")-1)) && Character.isDigit(b[i].charAt(b[i].length()-1))){
+        b[i]="varDeclare";
+        }
+        else if(b[i].equals("System.out.print")||b[i].equals("System.out.println")){
+          b[i]="print";
+        }
+        else if ((
+        b[i].equals("for") ||
+        b[i].equals("int") ||
+        b[i].equals("(") ||
+        b[i].equals(")") ||
+        b[i].equals("{") ||
+        b[i].equals("}") ||
+        b[i].equals("<") ||
+        b[i].equals(">") ||
+        b[i].equals("<=") ||
+        b[i].equals("=>") ||
+        b[i].equals("!=") ||
+        b[i].equals("=") ||
+        b[i].equals("==") ||
+        b[i].equals(";"))) {
+          b[i] = b[i];
+        }
+        else if ((Character.toString(b[i].charAt(0)).equals("+") && Character.toString(b[i].charAt(1)).equals("+") && b[i].length() > 2 && Character.isLetter(b[i].charAt(2))) ||
+        (Character.toString(b[i].charAt(0)).equals("-") && Character.toString(b[i].charAt(1)).equals("-") && b[i].length() > 2 && Character.isLetter(b[i].charAt(2))) ||
+        (b[i].length() > 2 && Character.isLetter(b[i].charAt(0)) && Character.toString(b[i].charAt(b[i].length() - 2)).equals("-") && Character.toString(b[i].charAt(b[i].length() - 1)).equals("-")) ||
+        (b[i].length() > 2 && Character.isLetter(b[i].charAt(0)) && Character.toString(b[i].charAt(b[i].length() - 2)).equals("+") && Character.toString(b[i].charAt(b[i].length() - 1)).equals("+"))) {
+         b[i] = "update";
+          }
+      else if(b[i].contains("+")||
         b[i].contains("-")||
         b[i].contains("/")||
         b[i].contains("%")||
@@ -47,47 +78,31 @@ public class ForLoop {
           (Character.isDigit(b[i].charAt(b[i].indexOf("*")+2)))||
           (Character.isDigit(b[i].charAt(b[i].indexOf("%")+2))))){
             b[i]="expr";
-          }
+              }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
 
+              }
+            
+            }
           }
         }
-
-        }
-      }
-      else if(b[i].contains("=") && Character.isAlphabetic(b[i].charAt(b[i].indexOf("=")-1)) && Character.isDigit(b[i].charAt(b[i].length()-1))){
-        b[i]="varDeclare";
-      }
-        else if(b[i]=="System.out.print"||b[i]=="System.out.println"){
-          b[i]="print";
-        }
-        else if(b[i].length()>2){
-        if((b[i].substring(0, 2)=="++" && Character.isAlphabetic(b[i].charAt(2)))||
-        (b[i].substring(0, 2)=="--" && Character.isAlphabetic(b[i].charAt(2)))||
-        (Character.isAlphabetic(b[i].charAt(0)) && b[i].substring(Math.max(b[i].length()-2,0))=="--")||
-        (Character.isAlphabetic(b[i].charAt(0)) && b[i].substring(Math.max(b[i].length()-2,0))=="++")){
-          b[i]="update";
-        }
-       }
         else if((b[i].charAt(0)=='-' && (Character.isAlphabetic(b[i].charAt(1)))||Character.isDigit(b[i].charAt(0)))){
-          b[i]="int";
+          b[i]="integer";
         }
-        else if((Character.isAlphabetic(b[i].charAt(0))|| b[i] instanceof String)&&
-        (!(b[i]=="for")||
-        !(b[i]=="(")||
-        !(b[i]==")")||
-        !(b[i]=="{")||
-        !(b[i]=="}")||
-        !(b[i]=="<")||
-        !(b[i]==">")||
-        !(b[i]=="<=")||
-        !(b[i]=="=>")||
-        !(b[i]=="int")||
-        !(b[i]==";"))){
-          b[i]="stringVar";
+        else if (b[i] instanceof String || b[i].length() == 1) {
+          b[i] = "stringVar";
         }
+         /*else if (b[i].matches("-?\\\\d+")) {
+          b[i] = "integer";
+        }*/
         else{
           b[i]="unknown";
         }
+      }
+      catch(Exception e){
+        System.out.println("An exception happened at: "+b[i]);
+        System.out.println("Exception: "+e);
+        System.out.println("index of i: "+b[i].indexOf("i"));
+      }
       }
       return b;
     }
