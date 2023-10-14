@@ -8,7 +8,7 @@ public class ForLoop {
           System.out.println("Hello World");
           System.out.println("Hello World");
         }*/
-        String a = "for ( int i=1 ; i<length ; ++i ) {    }";
+        String a = "for ( int i=1 ; i<length ; ++i ) { }";
         String[] test=tokenizer(a);
         System.out.println(Arrays.toString(test));
     }
@@ -18,8 +18,26 @@ public class ForLoop {
       a.trim();
       String[] b= a.split(" "); 
       for(int i=0; i<b.length; i++){
-        if((b[i].charAt(0)=='+' && b[i].charAt(1)=='+' && b[i].charAt(2).isChar)||() ){//gonna continue later
+        if(b[i].contains("+")||b[i].contains("-")||b[i].contains("/")||b[i].contains("%")||b[i].contains("*")){
+          if(){
 
+          }
+
+        }
+        else if(b[i]=="System.out.print"||b[i]=="System.out.println"){
+          b[i]="print";
+        }
+        else if((b[i].charAt(0)=='+' && b[i].charAt(1)=='+' && Character.isAlphabetic(b[i].charAt(2)))||
+        (b[i].charAt(0)=='-' && b[i].charAt(1)=='-' && Character.isAlphabetic(b[i].charAt(2)))||
+        (Character.isAlphabetic(b[i].charAt(0)) && b[i].charAt(1)=='-' && b[i].charAt(2)=='-')||
+        (Character.isAlphabetic(b[i].charAt(0)) && b[i].charAt(1)=='+' && b[i].charAt(2)=='+')){
+          b[i]="update";
+        }
+        else if((b[i].charAt(0)=='-' && Character.isDigit(b[i].charAt(1)))||Character.isDigit(b[i].charAt(0))){
+          b[i]="int";
+        }
+        else if(Character.isAlphabetic(b[i].charAt(0))|| b[i] instanceof String){
+          b[i]="stringVar";
         }
       }
       return b; //this is just for refresher
