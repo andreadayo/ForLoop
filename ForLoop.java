@@ -21,7 +21,7 @@ public class ForLoop {
       a.replace(" ", "");
       String[] b= a.split(" "); 
       for(int i=0; i<b.length; i++){
-        try{
+
         if(b[i].contains("=") && Character.isAlphabetic(b[i].charAt(b[i].indexOf("=")-1)) && Character.isDigit(b[i].charAt(b[i].length()-1))){
         b[i]="varDeclare";
         }
@@ -35,6 +35,11 @@ public class ForLoop {
         b[i].equals(")") ||
         b[i].equals("{") ||
         b[i].equals("}") ||
+        b[i].equals("+") ||
+        b[i].equals("-") ||
+        b[i].equals("*") ||
+        b[i].equals("/") ||
+        b[i].equals("%") ||
         b[i].equals("<") ||
         b[i].equals(">") ||
         b[i].equals("<=") ||
@@ -91,18 +96,10 @@ public class ForLoop {
         else if (b[i] instanceof String || b[i].length() == 1) {
           b[i] = "stringVar";
         }
-         /*else if (b[i].matches("-?\\\\d+")) {
-          b[i] = "integer";
-        }*/
         else{
           b[i]="unknown";
         }
-      }
-      catch(Exception e){
-        System.out.println("An exception happened at: "+b[i]);
-        System.out.println("Exception: "+e);
-        System.out.println("index of i: "+b[i].indexOf("i"));
-      }
+      
       }
       return b;
     }
