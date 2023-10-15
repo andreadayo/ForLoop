@@ -1,32 +1,51 @@
 import java.util.*;
 
+// SAMPLE: for ( int i=0 ; i<length ; ++i ) { int x , y , x ; int abc=0 ; a+=0 ; b-=1 ; ++g ; g-- ; --g ; g++ ; System.out.print ( 'hello' ) ; }
+
+// SAMPLE2: for ( int i = 0 ; i < length ; ++i ) { int x , y , x ; int abc = 0 ; a += 0 ; b -= 1 ; ++g ; g-- ; --g ; g++ ; System.out.print ( "hello" ) ; }
+
+// SAMPLE3: for ( int i = 0 ; i < length ; ++i ) { int x , y , x ; int var_name = 0 ; a += 0 ; b -= 1 ; ++g ; g-- ; --g ; g++ ; System.out.print ( "hello" ) ; }
+
 public class ForLoop {
 
   // Symbols
   static Set<String> separatorSymbols = new HashSet<>(
-      Arrays.asList("(", ")", "{", "}", ",", ";"));
+      Arrays.asList("=", "(", ")", "{", "}", ",", ";"));
   // Boolean Symbols
-  static Set<String> booleanSymbols = new HashSet<>(Arrays.asList("<", ">", "<=", "=>", "!=", "=", "=="));
+  static Set<String> booleanSymbols = new HashSet<>(Arrays.asList("<", ">", "<=", "=>", "!=", "=="));
   // Operators
-  static Set<String> expOperators = new HashSet<>(Arrays.asList("=", "+=", "-=", "*=", "/=", "%="));
+  static Set<String> expOperators = new HashSet<>(Arrays.asList("+=", "-=", "*=", "/=", "%="));
 
   public static void main(String[] args) {
     // Read syntax input
-    // Scanner scan = new Scanner(System.in);
-    // System.out.print("Enter syntax: ");
-    // String syntaxInput = scan.nextLine();
-
-    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { int x , y , x ; int abc = 0 ; a += 0 ; b-=1 ; ++g ; g-- ; --g ; g++ ; System.out.print ( 'hello' ) ; }";
+    Scanner scan = new Scanner(System.in);
+    System.out.print("Enter syntax: ");
+    String syntaxInput = scan.nextLine();
 
     // Split the input into an array and pass to tokenizer()
     String[] arrayInput = syntaxInput.trim().split("\\s+");
     String[] token = tokenizer(arrayInput);
 
-    System.out.println("Input: " + syntaxInput);
     System.out.println("\n" + Arrays.toString(token));
 
     System.out.println("\nChecking sequence...");
     if (checkSequence(token)) {
+      // Check Control Statement ()
+      int startControl = -1;
+      int endControl = -1;
+
+      for (int i = 0; i < token.length; i++) {
+        if (token[i].equals("(") && startControl == -1) {
+          startControl = i;
+        } else if (token[i].equals(")") && endControl == -1) {
+          endControl = i;
+        }
+      }
+
+      System.out.println("\nChecking control statements...");
+      checkControl(token, startControl, endControl);
+
+      // Check For Loop Statement {}
       int startStatement = 0, endStatement = 0;
 
       for (int i = 0; i < token.length; i++) {
@@ -39,8 +58,6 @@ public class ForLoop {
 
       System.out.println("\nChecking statements...");
       checkStatement(token, startStatement, endStatement);
-    } else {
-
     }
   }
 
@@ -60,7 +77,8 @@ public class ForLoop {
           (array[i].length() > 2 && Character.isLetter(array[i].charAt(0)) &&
               ((array[i].endsWith("--") || array[i].endsWith("++"))))) {
         tokenList.add("update");
-      } else if (separatorSymbols.contains(array[i]) || expOperators.contains(array[i])) {
+      } else if (separatorSymbols.contains(array[i]) || booleanSymbols.contains(array[i])
+          || expOperators.contains(array[i])) {
         tokenList.add(array[i]);
       } else if (array[i].matches("-?\\d+")) {
         tokenList.add("integer");
@@ -70,8 +88,8 @@ public class ForLoop {
         tokenList.add("printContent");
       } else if (expOperators.stream().anyMatch(array[i]::contains) && array[i].length() >= 3) {
         String pattern = String.join("|", expOperators)
-            .replaceAll("\\+", "\\[+\\]") // Escape plus sign
-            .replaceAll("\\*", "\\[\\*\\]"); // Escape asterisk
+            .replaceAll("\\+", "\\[+\\]")
+            .replaceAll("\\*", "\\[\\*\\]");
         String[] exprArray = array[i].split("(?=" + pattern + ")|(?<=" + pattern + ")");
 
         for (int j = 0; j < exprArray.length; j++) {
@@ -83,16 +101,44 @@ public class ForLoop {
             tokenList.add(exprArray[j]);
           }
         }
+      } else if (booleanSymbols.stream().anyMatch(array[i]::contains) && array[i].length() >= 3) {
+        String pattern = String.join("|", booleanSymbols);
+        String[] boolArray = array[i].split("(?=" + pattern + ")|(?<=" + pattern + ")");
+
+        for (int j = 0; j < boolArray.length; j++) {
+          if (boolArray[j].matches("-?\\d+")) {
+            tokenList.add("integer");
+          } else if (boolArray[j].matches("[a-zA-Z0-9_]+")) {
+            tokenList.add("varName");
+          } else if (booleanSymbols.contains(boolArray[j])) {
+            tokenList.add(boolArray[j]);
+          }
+        }
+      } else if (array[i].contains("=") && array[i].length() >= 3) {
+        String[] equalArray = array[i].split("(?<=\\=)|(?=\\=)");
+
+        for (int j = 0; i < equalArray.length; j++) {
+          if (equalArray[j].matches("-?\\d+")) {
+            tokenList.add("integer");
+          } else if (equalArray[j].matches("[a-zA-Z0-9_]+")) {
+            tokenList.add("varName");
+          } else if (expOperators.contains(equalArray[j])) {
+            tokenList.add(equalArray[j]);
+          } else if ("=".equals(equalArray[j])) {
+            tokenList.add("=");
+          }
+        }
       } else {
         tokenList.add("illegal");
       }
     }
 
-    // Convert the ArrayList to a String[] and return it
     return tokenList.toArray(new String[0]);
+
   }
 
-  // check sequence
+  // checkSequence(): Validate if separators () or {} are balanced & if it follows
+  // the proper for loop syntax
   public static boolean checkSequence(String[] token) {
     boolean beginningCorrect = false, middleCorrect = true, endCorrect = false, isBalanced = true;
     boolean firstBraceCheckDone = false, openBraceCheckDone = false;
@@ -177,21 +223,6 @@ public class ForLoop {
       }
     }
 
-    // check content of for loop control statement (the one inside the parenthesis)
-    int startControl = -1; // Initialize to -1 to indicate that it hasn't been found yet
-    int endControl = -1; // Initialize to -1 to indicate that it hasn't been found yet
-
-    for (int i = 0; i < token.length; i++) {
-      if (token[i].equals("(") && startControl == -1) {
-        startControl = i; // Set the position of the first '('
-      } else if (token[i].equals(")") && endControl == -1) {
-        endControl = i; // Set the position of the first ')'
-      }
-    }
-
-    System.out.println("Checking control statements...");
-    checkControl(token, startControl, endControl);
-
     // check end
     if (token[token.length - 1].equals("}")) {
       endCorrect = true;
@@ -206,20 +237,19 @@ public class ForLoop {
     }
   }
 
+  // checkControl(): Validates if the control statements inside for() are correct
   public static boolean checkControl(String[] token, int start, int end) {
     start++; // Start checking tokens after "("
 
+    boolean validConditionMet = false;
+    ArrayList<String> line = new ArrayList<>();
     ArrayList<String> controlContent = new ArrayList<>();
 
-    boolean validConditionMet = false;
-
-    ArrayList<String> line = new ArrayList<>(); // Initialize the line ArrayList
-
-    for (int i = start; i <= end; i++) { // Changed "<" to "<=" to include the last token
+    for (int i = start; i <= end; i++) {
       String currentToken = token[i];
-      line.add(currentToken); // Add the current token to the ArrayList
+      line.add(currentToken);
 
-      if (i == end || currentToken.equals(";")) { // Check if it's the end or a semicolon
+      if (i == end || currentToken.equals(";")) {
         String content = "";
         if (line.get(0).equals("int")
             || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
@@ -244,7 +274,7 @@ public class ForLoop {
           controlContent.add(content);
         }
         start = i + 1;
-        line.clear(); // Clear the ArrayList for the next line
+        line.clear();
       }
     }
 
@@ -267,20 +297,21 @@ public class ForLoop {
       System.out.println("Illegal control statement");
     }
 
-    return validConditionMet; // Return true if a valid condition is met, false otherwise
+    return validConditionMet;
   }
 
+  // checkStatement(): Validates if for loop statements are correct
+  // It should accept varDeclare, update, print, exp
   public static boolean checkStatement(String[] token, int start, int end) {
     start += 1; // Start checking tokens after "{"
 
     ArrayList<String> line = new ArrayList<>();
-    int i = start; // Initialize the iterator to the start index
-
+    int i = start;
     boolean validConditionMet = false;
 
     while (i < end) {
       String currentToken = token[i];
-      line.add(currentToken); // Add the current token to the ArrayList
+      line.add(currentToken);
 
       if (currentToken.equals(";") && !line.isEmpty()) {
         if (line.get(0).equals("int")
@@ -301,32 +332,33 @@ public class ForLoop {
             validConditionMet = true;
           }
         }
-        // Update the start index to the index following the semicolon
+        System.out.println(line);
         start = i + 1;
-        // Clear the ArrayList for the next line
         line.clear();
       }
-      i++; // Move to the next token
+      i++;
     }
 
     if (!validConditionMet) {
       System.out.println("Illegal statement");
     }
 
-    return validConditionMet; // Return true if a valid condition is met, false otherwise
+    return validConditionMet;
   }
 
+  // checkVarDeclare(): Validates if the variable declaration is correct
+  // It accepts [int] <varName> = <varName>||<integer> ;
   public static boolean checkVarDeclare(String[] token, int start, int end) {
     // Identifier List
     if (end - start > 4 && token[start].equals("int")) {
-      int i = start + 1; // Start after "int"
+      int i = start + 1;
       while (i < end) {
         if (token[i].equals("varName")) {
-          i++; // Move to the next token
+          i++;
 
           if (i < end + 1) {
             if (token[i].equals(",")) {
-              i++; // Move past the comma if it's present
+              i++;
             } else if (token[i].equals(";")) {
               System.out.println("Correct Identifier List Declaration");
               return true;
@@ -378,6 +410,7 @@ public class ForLoop {
     return false;
   }
 
+  // checkUpdate(): Validates if update has the correct syntax
   public static boolean checkUpdate(String[] token, int start, int end) {
     for (int i = start; i <= end - 1; i++) {
       if (token[i].equals("update")) {
@@ -389,7 +422,8 @@ public class ForLoop {
     return false;
   }
 
-  // check condition
+  // checkCondition(): Validates if condition has the correct syntax
+  // It accepts <varName> <comparisonSymbol> <varName>||<integer>
   public static boolean checkCondition(String[] token, int start, int end) {
     int startIndex = start;
 
@@ -400,8 +434,6 @@ public class ForLoop {
         break;
       }
     }
-
-    // check condition <varName> <comparisonSymbol> <varName>||<integer>
     // make sure that the left side is a variable or an integer
     if ((token[startIndex].equals("varName")) &&
     // make sure that it's followed by a comparison symbol
@@ -417,7 +449,8 @@ public class ForLoop {
 
   }
 
-  // check expressions
+  // checkExpression(): Validates if expression has the correct syntax
+  // It accepts <varName> <expOperator> <digit>||<char> [;]
   public static boolean checkExpression(String[] token, int start, int end) {
     Set<String> expOp = new HashSet<>(Arrays.asList("+=", "-=", "*=", "/=", "%="));
 
@@ -432,6 +465,8 @@ public class ForLoop {
     return false;
   }
 
+  // checkPrint(): Validates if sysout print has the correct syntax
+  // It accepts <print> ( <printContent>||<varName> ) ;
   public static boolean checkPrint(String[] token, int start, int end) {
     for (int i = start; i <= end - 1; i++) {
       if (token[i].equals("print") &&
