@@ -10,11 +10,16 @@ public class ForLoop {
           System.out.println("Hello World");
           System.out.println("Hello World");
         }*/
-        String a = "for ( int i=1 ; i < length ; ++i ) { a+=0 0 ; ++g ; g-- ; --g ; g++ ; System.out.print ( 'hello' ) }";
+        /*String a = "for ( int i=1 ; i < length ; ++i ) { a+=0 0 ; ++g ; g-- ; --g ; g++ ; System.out.print ( 'hello' ) }";
         String[] b= a.split(" "); 
         System.out.println(Arrays.toString(b));
         String[] test=tokenizer(a);
-        System.out.println(Arrays.toString(test));
+        System.out.println(Arrays.toString(test));*/
+
+        String[] a = {"update", "'"};
+        System.out.println(Arrays.toString(a));
+        System.out.println("boolean: "+ isCorrectUpdate(a, 0, 2));
+
     }
     
     //natalia
@@ -93,13 +98,30 @@ public class ForLoop {
       return b;
     }
     //natalia
-    public boolean print(String[] array){
-      return true;
+    public static boolean isCorrectPrint(String[] token, int start, int end){
+      for(int i=start; i<= end-1; i++){
+        if(token[i].equals("print")&&
+        token[i+1].equals("(")&&
+        token[i+2].equals("printContent")&&
+        token[i+3].equals(")")&&
+        token[i+4].equals(";")){
+          return true;
+        }
+      }
+      System.out.println("Incorrect System.out.print statement");
+      return false;
     }
     //natalia
-    public boolean update(String[] array){
-      return true;
-    }
+    public static boolean isCorrectUpdate(String[] token, int start, int end) {
+        for(int i=start; i <= end-1; i++){
+          if(token[i].equals("update") && token[i+1].equals(";")){
+            return true;
+          }
+       }
+       System.out.println("Incorrect update");
+            return false;
+      }
+}
 
-  }
+
 
