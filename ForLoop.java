@@ -3,8 +3,10 @@ import java.util.*;
 public class ForLoop {
 
   // Symbols
-  static Set<String> symbols = new HashSet<>(
-      Arrays.asList("(", ")", "{", "}", ",", ";", "<", ">", "<=", "=>", "!=", "=", "=="));
+  static Set<String> separatorSymbols = new HashSet<>(
+      Arrays.asList("(", ")", "{", "}", ",", ";"));
+  // Boolean Symbols
+  static Set<String> booleanSymbols = new HashSet<>(Arrays.asList("<", ">", "<=", "=>", "!=", "=", "=="));
   // Operators
   static Set<String> expOperators = new HashSet<>(Arrays.asList("=", "+=", "-=", "*=", "/=", "%="));
 
@@ -14,10 +16,7 @@ public class ForLoop {
     // System.out.print("Enter syntax: ");
     // String syntaxInput = scan.nextLine();
 
-    String syntaxInput = "for ( int i=1 ; i < length ; ++i ) { int x , y , x ; int abc = 0 ; a += 0 ; b-=1 ; ++g ; g-- ; --g ; g++ ; System.out.print ( 'hello' ) ; }";
-
-    // String syntaxInput = "for ( int i=1 ; i < length ; ++i ) { counter -= 12 ;
-    // }";
+    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { int x , y , x ; int abc = 0 ; a += 0 ; b-=1 ; ++g ; g-- ; --g ; g++ ; System.out.print ( 'hello' ) ; }";
 
     // Split the input into an array and pass to tokenizer()
     String[] arrayInput = syntaxInput.trim().split("\\s+");
@@ -61,7 +60,7 @@ public class ForLoop {
           (array[i].length() > 2 && Character.isLetter(array[i].charAt(0)) &&
               ((array[i].endsWith("--") || array[i].endsWith("++"))))) {
         tokenList.add("update");
-      } else if (symbols.contains(array[i]) || expOperators.contains(array[i])) {
+      } else if (separatorSymbols.contains(array[i]) || expOperators.contains(array[i])) {
         tokenList.add(array[i]);
       } else if (array[i].matches("-?\\d+")) {
         tokenList.add("integer");
@@ -104,7 +103,6 @@ public class ForLoop {
       if (token[i].equals("(")) {
         pairStack.push(token[i]);
       }
-
       if (token[i].equals(")")) {
         if (pairStack.empty()) {
           isBalanced = false;
@@ -177,8 +175,22 @@ public class ForLoop {
         }
         firstBraceCheckDone = true;
       }
-
     }
+
+    // check content of for loop control statement (the one inside the parenthesis)
+    int startControl = -1; // Initialize to -1 to indicate that it hasn't been found yet
+    int endControl = -1; // Initialize to -1 to indicate that it hasn't been found yet
+
+    for (int i = 0; i < token.length; i++) {
+      if (token[i].equals("(") && startControl == -1) {
+        startControl = i; // Set the position of the first '('
+      } else if (token[i].equals(")") && endControl == -1) {
+        endControl = i; // Set the position of the first ')'
+      }
+    }
+
+    System.out.println("Checking control statements...");
+    checkControl(token, startControl, endControl);
 
     // check end
     if (token[token.length - 1].equals("}")) {
@@ -186,12 +198,76 @@ public class ForLoop {
     }
 
     if (isBalanced && beginningCorrect && middleCorrect && endCorrect) {
-      System.out.println("Correct Sequence");
+      System.out.println("Correct for () {} Sequence");
       return true;
     } else {
-      System.out.println("Incorrect Sequence");
+      System.out.println("Incorrect for () {} Sequence");
       return false;
     }
+  }
+
+  public static boolean checkControl(String[] token, int start, int end) {
+    start++; // Start checking tokens after "("
+
+    ArrayList<String> controlContent = new ArrayList<>();
+
+    boolean validConditionMet = false;
+
+    ArrayList<String> line = new ArrayList<>(); // Initialize the line ArrayList
+
+    for (int i = start; i <= end; i++) { // Changed "<" to "<=" to include the last token
+      String currentToken = token[i];
+      line.add(currentToken); // Add the current token to the ArrayList
+
+      if (i == end || currentToken.equals(";")) { // Check if it's the end or a semicolon
+        String content = "";
+        if (line.get(0).equals("int")
+            || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
+          if (checkVarDeclare(token, start, i)) {
+            content = "varDeclare";
+          }
+        } else if (line.get(0).equals("update")) {
+          if (checkUpdate(token, start, i)) {
+            content = "update";
+          }
+        } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))) {
+          if (checkExpression(token, start, i)) {
+            content = "expr";
+          }
+        } else if (line.get(0).equals("varName") && booleanSymbols.contains(line.get(1))) {
+          if (checkCondition(token, start, i)) {
+            content = "condition";
+          }
+        }
+
+        if (!content.isEmpty()) {
+          controlContent.add(content);
+        }
+        start = i + 1;
+        line.clear(); // Clear the ArrayList for the next line
+      }
+    }
+
+    if (controlContent.isEmpty()) {
+      System.out.println("Control statement is empty");
+    } else if (controlContent.size() < 3) {
+      System.out.println("Control statement has less than 3 statements");
+    } else if (controlContent.size() == 3) {
+      if (controlContent.get(0).equals("varDeclare") &&
+          controlContent.get(1).equals("condition") &&
+          controlContent.get(2).equals("update")) {
+        System.out.println("Correct control statements");
+        validConditionMet = true;
+      }
+    } else if (controlContent.size() > 3) {
+      System.out.println("Control statement has more than 3 statements");
+    }
+
+    if (!validConditionMet) {
+      System.out.println("Illegal control statement");
+    }
+
+    return validConditionMet; // Return true if a valid condition is met, false otherwise
   }
 
   public static boolean checkStatement(String[] token, int start, int end) {
@@ -212,7 +288,7 @@ public class ForLoop {
           if (checkVarDeclare(token, start, i)) {
             validConditionMet = true;
           }
-        } else if (line.get(0).equals("update")) {
+        } else if (line.get(0).equals("update") && line.get(line.size() - 1).contains(";")) {
           if (checkUpdate(token, start, i)) {
             validConditionMet = true;
           }
@@ -304,7 +380,7 @@ public class ForLoop {
 
   public static boolean checkUpdate(String[] token, int start, int end) {
     for (int i = start; i <= end - 1; i++) {
-      if (token[i].equals("update") && token[i + 1].equals(";")) {
+      if (token[i].equals("update")) {
         System.out.println("Correct Update");
         return true;
       }
@@ -314,9 +390,8 @@ public class ForLoop {
   }
 
   // check condition
-  public static boolean conditionCorrect(String[] token) {
-    int startIndex = 0;
-    Set<String> comparisonSymbols = new HashSet<>(Arrays.asList("==", "!=", "<", "<=", ">", ">="));
+  public static boolean checkCondition(String[] token, int start, int end) {
+    int startIndex = start;
 
     // finds condition
     for (int i = 0; i < token.length; i++) {
@@ -326,11 +401,11 @@ public class ForLoop {
       }
     }
 
-    // check condition <varName>||<integer> <comparisonSymbol> <varName>||<integer>
+    // check condition <varName> <comparisonSymbol> <varName>||<integer>
     // make sure that the left side is a variable or an integer
-    if ((token[startIndex].equals("varName") || token[startIndex].equals("integer")) &&
+    if ((token[startIndex].equals("varName")) &&
     // make sure that it's followed by a comparison symbol
-        (comparisonSymbols.contains(token[startIndex + 1])) &&
+        (booleanSymbols.contains(token[startIndex + 1])) &&
         // make sure that the right side is either a variable or an integer
         (token[startIndex + 2].equals("varName") || token[startIndex + 2].equals("integer"))) {
       System.out.println("Correct Condition");
@@ -364,11 +439,11 @@ public class ForLoop {
           token[i + 2].equals("printContent") &&
           token[i + 3].equals(")") &&
           token[i + 4].equals(";")) {
-        System.out.println("Correct Print statement");
+        System.out.println("Correct Print Statement");
         return true;
       }
     }
-    System.out.println("Incorrect Print statement");
+    System.out.println("Incorrect Print Statement");
     return false;
   }
 }
