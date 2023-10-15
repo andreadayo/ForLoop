@@ -36,6 +36,11 @@ public class TestTokenizer {
         token[i] = "print";
       } else if (array[i].equals("int")) {
         token[i] = "int";
+      }else if (((array[i].startsWith("++")
+          || array[i].startsWith("--")) && array[i].length() > 2 && Character.isLetter(array[i].charAt(2))) ||
+          (array[i].length() > 2 && Character.isLetter(array[i].charAt(0)) &&
+              ((array[i].endsWith("--") || array[i].endsWith("++"))))) {
+        token[i] = "update";
       }else if(expOperators.contains(array[i])&&
       array[i].length()>3 &&
       Character.isLetter(array[i].charAt(0)) &&
@@ -51,7 +56,11 @@ public class TestTokenizer {
       array[i].substring(array[i].indexOf("%")+2).matches("-?\\d+")) 
       ){    
       token[i]="expr"; 
-      }else if(array[i].contains("=") && !expOperators.contains(array[i]) && Character.isAlphabetic(array[i].charAt(0)) && array[i].substring(array[i].indexOf("=")+1).matches("-?\\d+")){
+      }else if(array[i].contains("=") && 
+      !expOperators.contains(array[i]) && 
+      Character.isAlphabetic(array[i].charAt(0)) && 
+      array[i].substring(array[i].indexOf("=")+1).matches("-?\\d+")
+      ){
       token[i]="varDeclare";
       }else if (symbols.contains(array[i]) || expOperators.contains(array[i])) {
         token[i] = array[i];
@@ -61,11 +70,6 @@ public class TestTokenizer {
         token[i] = "varName";
       } else if (array[i].matches(".*[\"'].*")) {
         token[i] = "printContent";
-      } else if (array[i].startsWith("++")
-          || array[i].startsWith("--") && array[i].length() > 2 && Character.isLetter(array[i].charAt(2)) ||
-          (array[i].length() > 2 && Character.isLetter(array[i].charAt(0)) &&
-              (array[i].endsWith("--") || array[i].endsWith("++")))) {
-        token[i] = "update";
       } else {
         token[i] = "illegal";
       }
