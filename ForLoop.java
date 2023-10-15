@@ -93,11 +93,11 @@ public class ForLoop {
       return b;
     }
     //natalia
-    public boolean print(String[] a){
+    public boolean print(String[] array){
       return true;
     }
     //natalia
-    public boolean update(String[] a){
+    public boolean update(String[] array){
       return true;
     }
 
