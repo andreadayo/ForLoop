@@ -97,7 +97,7 @@ public class ForLoop {
       }
       return b;
     }
-    //natalia
+    //this is the final product
     public static boolean isCorrectPrint(String[] token, int start, int end){
       for(int i=start; i<= end-1; i++){
         if(token[i].equals("print")&&
@@ -111,7 +111,7 @@ public class ForLoop {
       System.out.println("Incorrect System.out.print statement");
       return false;
     }
-    //natalia
+    //this is the final product
     public static boolean isCorrectUpdate(String[] token, int start, int end) {
         for(int i=start; i <= end-1; i++){
           if(token[i].equals("update") && token[i+1].equals(";")){

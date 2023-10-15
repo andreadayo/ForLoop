@@ -43,8 +43,8 @@ public class TestTokenizer {
         token[i] = "update";
       }else if(expOperators.contains(array[i])&&
       array[i].length()>3 &&
-      Character.isLetter(array[i].charAt(0)) &&
-      ((Character.isAlphabetic(array[i].charAt(array[i].indexOf("+")+2)))||
+      Character.isAlphabetic(array[i].charAt(0)) &&
+      (((Character.isAlphabetic(array[i].charAt(array[i].indexOf("+")+2)))||
       (Character.isAlphabetic(array[i].charAt(array[i].indexOf("-")+2)))||
       (Character.isAlphabetic(array[i].charAt(array[i].indexOf("/")+2)))||
       (Character.isAlphabetic(array[i].charAt(array[i].indexOf("*")+2)))||
@@ -53,7 +53,7 @@ public class TestTokenizer {
       array[i].substring(array[i].indexOf("-")+2).matches("-?\\d+")||
       array[i].substring(array[i].indexOf("/")+2).matches("-?\\d+")||
       array[i].substring(array[i].indexOf("*")+2).matches("-?\\d+")||
-      array[i].substring(array[i].indexOf("%")+2).matches("-?\\d+")) 
+      array[i].substring(array[i].indexOf("%")+2).matches("-?\\d+"))) 
       ){    
       token[i]="expr"; 
       }else if(array[i].contains("=") && 
