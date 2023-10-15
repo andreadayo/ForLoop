@@ -1,4 +1,6 @@
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ForLoop {
     public static void main(String[] args)
@@ -8,7 +10,7 @@ public class ForLoop {
           System.out.println("Hello World");
           System.out.println("Hello World");
         }*/
-        String a = "for ( int i=1 ; i < length ; ++i ) { a+=0 0 ; ++g ; g-- ; --g ; g++; System.out.print ( 'hello' ) }";
+        String a = "for ( int i=1 ; i < length ; ++i ) { a+=0 0 ; ++g ; g-- ; --g ; g++ ; System.out.print ( 'hello' ) }";
         String[] b= a.split(" "); 
         System.out.println(Arrays.toString(b));
         String[] test=tokenizer(a);
@@ -17,12 +19,17 @@ public class ForLoop {
     
     //natalia
     public static String[] tokenizer(String a){
+          // Symbols
+    Set<String> symbols = new HashSet<>(Arrays.asList("(", ")", "{", "}", ";", "<", ">", "<=", "=>", "!=", "=", "=="));
+    // Operators
+    Set<String> expOperators = new HashSet<>(Arrays.asList("+=", "-=", "*=", "/=", "%="));
+
       a.trim();
       a.replace(" ", "");
       String[] b= a.split(" "); 
       for(int i=0; i<b.length; i++){
 
-        if(b[i].contains("=") && Character.isAlphabetic(b[i].charAt(b[i].indexOf("=")-1)) && Character.isDigit(b[i].charAt(b[i].length()-1))){
+        if(b[i].contains("=") && Character.isAlphabetic(b[i].charAt(0)) && b[i].substring(b[i].indexOf("=")+1).matches("-?\\d+")){
         b[i]="varDeclare";
         }
         else if(b[i].equals("System.out.print")||b[i].equals("System.out.println")){
@@ -56,44 +63,26 @@ public class ForLoop {
         (b[i].length() > 2 && Character.isLetter(b[i].charAt(0)) && Character.toString(b[i].charAt(b[i].length() - 2)).equals("+") && Character.toString(b[i].charAt(b[i].length() - 1)).equals("+"))) {
          b[i] = "update";
           }
-      else if(b[i].contains("+")||
-        b[i].contains("-")||
-        b[i].contains("/")||
-        b[i].contains("%")||
-        b[i].contains("*")){
-          if(b[i].length()>3){
-          if((Character.isAlphabetic(b[i].charAt(b[i].indexOf("+")-1)))||
-          (Character.isAlphabetic(b[i].charAt(b[i].indexOf("-")-1)))||
-          (Character.isAlphabetic(b[i].charAt(b[i].indexOf("/")-1)))||
-          (Character.isAlphabetic(b[i].charAt(b[i].indexOf("*")-1)))||
-          (Character.isAlphabetic(b[i].charAt(b[i].indexOf("%")-1)))){
-            if(((b[i].charAt(b[i].indexOf("+")+1))=='=')||
-          ((b[i].charAt(b[i].indexOf("-")+1))=='=')||
-          ((b[i].charAt(b[i].indexOf("/")+1))=='=')||
-          ((b[i].charAt(b[i].indexOf("%")+1))=='=')||
-          ((b[i].charAt(b[i].indexOf("*")+1))=='=')){
-            if(((Character.isAlphabetic(b[i].charAt(b[i].indexOf("+")+2)))||
+      else if(expOperators.contains(b[i])&&
+      b[i].length()>3 &&
+      Character.isLetter(b[i].charAt(0)) &&
+      ((Character.isAlphabetic(b[i].charAt(b[i].indexOf("+")+2)))||
           (Character.isAlphabetic(b[i].charAt(b[i].indexOf("-")+2)))||
           (Character.isAlphabetic(b[i].charAt(b[i].indexOf("/")+2)))||
           (Character.isAlphabetic(b[i].charAt(b[i].indexOf("*")+2)))||
           (Character.isAlphabetic(b[i].charAt(b[i].indexOf("%")+2))))||
-          ((Character.isDigit(b[i].charAt(b[i].indexOf("+")+2)))||
-          (Character.isDigit(b[i].charAt(b[i].indexOf("-")+2)))||
-          (Character.isDigit(b[i].charAt(b[i].indexOf("/")+2)))||
-          (Character.isDigit(b[i].charAt(b[i].indexOf("*")+2)))||
-          (Character.isDigit(b[i].charAt(b[i].indexOf("%")+2))))){
-            b[i]="expr";
-              }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-
-              }
-            
-            }
-          }
+          (b[i].substring(b[i].indexOf("+")+2).matches("-?\\d+")||
+          b[i].substring(b[i].indexOf("-")+2).matches("-?\\d+")||
+          b[i].substring(b[i].indexOf("/")+2).matches("-?\\d+")||
+          b[i].substring(b[i].indexOf("*")+2).matches("-?\\d+")||
+          b[i].substring(b[i].indexOf("%")+2).matches("-?\\d+")) 
+          ){    
+          b[i]="expr";
         }
-        else if((b[i].charAt(0)=='-' && (Character.isAlphabetic(b[i].charAt(1)))||Character.isDigit(b[i].charAt(0)))){
+        else if(b[i].matches("-?\\d+")){  //((b[i].charAt(0)=='-' && (Character.isAlphabetic(b[i].charAt(1)))||(Character.isDigit(b[i].charAt(0)) && !()))){
           b[i]="integer";
         }
-        else if (b[i] instanceof String || b[i].length() == 1) {
+        else if(b[i].matches("[a-zA-Z0-9_]+")){        //((b[i] instanceof String && b[i])|| b[i].length() == 1) {
           b[i] = "stringVar";
         }
         else{

@@ -36,7 +36,24 @@ public class TestTokenizer {
         token[i] = "print";
       } else if (array[i].equals("int")) {
         token[i] = "int";
-      } else if (symbols.contains(array[i]) || expOperators.contains(array[i])) {
+      }else if(expOperators.contains(array[i])&&
+      array[i].length()>3 &&
+      Character.isLetter(array[i].charAt(0)) &&
+      ((Character.isAlphabetic(array[i].charAt(array[i].indexOf("+")+2)))||
+      (Character.isAlphabetic(array[i].charAt(array[i].indexOf("-")+2)))||
+      (Character.isAlphabetic(array[i].charAt(array[i].indexOf("/")+2)))||
+      (Character.isAlphabetic(array[i].charAt(array[i].indexOf("*")+2)))||
+      (Character.isAlphabetic(array[i].charAt(array[i].indexOf("%")+2))))||
+      (array[i].substring(array[i].indexOf("+")+2).matches("-?\\d+")||
+      array[i].substring(array[i].indexOf("-")+2).matches("-?\\d+")||
+      array[i].substring(array[i].indexOf("/")+2).matches("-?\\d+")||
+      array[i].substring(array[i].indexOf("*")+2).matches("-?\\d+")||
+      array[i].substring(array[i].indexOf("%")+2).matches("-?\\d+")) 
+      ){    
+      token[i]="expr"; 
+      }else if(array[i].contains("=") && !expOperators.contains(array[i]) && Character.isAlphabetic(array[i].charAt(0)) && array[i].substring(array[i].indexOf("=")+1).matches("-?\\d+")){
+      token[i]="varDeclare";
+      }else if (symbols.contains(array[i]) || expOperators.contains(array[i])) {
         token[i] = array[i];
       } else if (array[i].matches("-?\\d+")) {
         token[i] = "integer";
