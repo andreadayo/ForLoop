@@ -77,6 +77,7 @@ public class TestTokenizer {
     return token;
   }
 
+  //check sequence
   public static boolean sequenceCorrect(String[] token) {
     boolean beginningCorrect = false, middleCorrect = true, endCorrect = false, isBalanced = true;
     boolean firstBraceCheckDone = false, openBraceCheckDone = false;
@@ -177,6 +178,7 @@ public class TestTokenizer {
         }
   }
 
+  //check condition
   public static boolean conditionCorrect(String[] token) {
     int startIndex = 0;
     Set<String> comparisonSymbols = new HashSet<>(Arrays.asList("==", "!=", "<", "<=", ">", ">="));
