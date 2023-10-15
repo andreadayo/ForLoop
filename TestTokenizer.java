@@ -77,4 +77,157 @@ public class TestTokenizer {
     return token;
   }
 
+  public static boolean sequenceCorrect(String[] token) {
+    boolean beginningCorrect = false, middleCorrect = true, endCorrect = false, isBalanced = true;
+    boolean firstBraceCheckDone = false, openBraceCheckDone = false;
+    Stack pairStack = new Stack<String>();
+
+    //check for parenthesis balance
+    for (int i = 0; i<token.length; i++) {
+      if (token[i].equals("(")) {
+        pairStack.push(token[i]);
+      }
+
+      if (token[i].equals(")")) {
+        if (pairStack.empty()) {
+          isBalanced = false;
+        } else {
+          pairStack.pop();
+        }
+      }
+    }
+
+    //check for any leftovers
+    if (!pairStack.empty()) {
+      isBalanced = false;
+    }
+
+    //check for curly brace balance
+    for (int i = 0; i<token.length; i++) {
+      if (token[i].equals("{")) {
+        pairStack.push(token[i]);
+      }
+
+      if (token[i].equals("}")) {
+        if (pairStack.empty()) {
+          isBalanced = false;
+            } else {
+              pairStack.pop();
+            }
+          }
+    }
+
+    //check for any leftovers again
+    if (!pairStack.empty()) {
+      isBalanced = false;
+    }
+
+    //checking the actual sequence
+    //check beginning
+    if (token[0].equals("for") && token[1].equals("(")) {
+      beginningCorrect = true;
+    }
+
+    //check middle
+    for (int i=0; i<token.length; ++i) {
+      if (token[i].equals("(")) {
+        pairStack.push(token[i]);
+      }
+
+      if (token[i].equals(")")) {
+        if (!pairStack.isEmpty()) {
+          pairStack.pop();
+        }
+      }
+
+      //checks "){"
+      if (i > 0 && pairStack.isEmpty() && !openBraceCheckDone) {
+        if (i < token.length-1) {
+          if (!token[i+1].equals("{")) {
+            middleCorrect = false;
+          }
+        } else {
+          middleCorrect = false;
+        }
+        
+        openBraceCheckDone = true;
+      }
+
+      //makes sure { is ONLY after ) and only triggers at the first )
+      if (token[i].equals("{") && !firstBraceCheckDone) {
+        if (!pairStack.isEmpty()) {
+          middleCorrect = false;
+        }
+        firstBraceCheckDone = true;
+      }
+
+    }
+
+    //check end
+    if (token[token.length-1].equals("}")) {
+      endCorrect = true;
+    }
+
+    if (isBalanced && beginningCorrect && middleCorrect && endCorrect) {
+      System.out.println("Correct Sequence");
+        return true;
+        } else {
+            System.out.println("Incorrect Sequence");
+            return false;
+        }
+  }
+
+  public static boolean conditionCorrect(String[] token) {
+    int startIndex = 0;
+    Set<String> comparisonSymbols = new HashSet<>(Arrays.asList("==", "!=", "<", "<=", ">", ">="));
+
+    //finds condition
+    for (int i = 0; i < token.length; i++) {
+      if (token[i].equals(";")) {
+        startIndex = i+1;
+        break;
+      }
+    }
+
+    //check condition <varName>||<integer> <comparisonSymbol> <varName>||<integer>
+    //make sure that the left side is a variable or an integer
+    if ((token[startIndex].equals("varName") || token[startIndex].equals("integer")) &&
+      //make sure that it's followed by a comparison symbol
+      (comparisonSymbols.contains(token[startIndex+1])) &&
+        //make sure that the right side is either a variable or an integer
+      (token[startIndex+2].equals("varName") || token[startIndex+2].equals("integer"))) {
+        System.out.println("Correct Condition");
+        return true;
+    } else {
+      System.out.println("Inorrect Condition");
+      return false;
+    }
+    
+  }
+
+  //check expressions
+  public static boolean exprCorrect(String[] token) {
+    Set<String> expOp = new HashSet<>(Arrays.asList("+=", "-=", "*=", "/=", "%="));
+    
+    for (int i = 1; i < token.length; i++) {
+      if (expOp.contains(token[i])) {
+        if (token[i-1].equals("varName") && 
+          (token[i+1].equals("integer") || token[i+1].equals("varName")) && token[i+2].equals(";")) {
+            System.out.println("Correct Expression/s");
+            return true;
+          } else {
+            System.out.println("Incorrect Expression/s");
+            return false;
+          }
+      } else if (token[i].equals("expr")) {
+        if (!token[i+1].equals(";")) {
+          System.out.println("Incorrect Expression/s");
+            return false;
+        } else {
+          System.out.println("Correct Expression/s");
+        }
+      }
+    }
+    return true;
+  }
 }
