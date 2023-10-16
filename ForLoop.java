@@ -30,7 +30,7 @@ public class ForLoop {
     // System.out.print("Enter syntax: ");
     // String syntaxInput = scan.nextLine();
 
-    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { a=1 ; 123 ; a++ ; a+=2 ; }";
+    String syntaxInput = "for ( a++ ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a++ ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } a++ ; }";
 
     // Split the input into an array and pass to tokenizer()
     String[] arrayInput = syntaxInput.trim().split("\\s+");
@@ -39,24 +39,15 @@ public class ForLoop {
     System.out.println("Input: " + syntaxInput);
     System.out.println("\n" + Arrays.toString(token));
 
-    // Count how many "for" exists
-    int forCounter = 0;
+    // Count how many "for" exists and store its index
     int tokenCounter = 0;
     ArrayList<Integer> forIndex = new ArrayList<>();
     for (String word : token) {
       if (word.equals("for")) {
-        forCounter++;
         forIndex.add(tokenCounter);
       }
       tokenCounter++;
     }
-
-    /*
-     * System.out.println("For Counter: " + forCounter);
-     * for (int counter : forIndex) {
-     * System.out.println("For Index: " + counter);
-     * }
-     */
 
     // Ensure forIndex is not empty
     if (!forIndex.isEmpty()) {
@@ -106,7 +97,8 @@ public class ForLoop {
             checkControl(token, startControl, endControl);
 
             // Check For Loop Statement {}
-            int startStatement = 0, endStatement = 0;
+            int startStatement = forStartIndex;
+            int endStatement = forEndIndex;
 
             for (int j = forStartIndex; j <= forEndIndex; j++) {
               if (token[j].equals("{")) {
@@ -126,9 +118,9 @@ public class ForLoop {
           }
 
           if (isSyntaxValid) {
-            System.out.println("Syntax of 'for' loop at index " + forStartIndex + " is valid.");
+            System.out.println("\n== Syntax of 'for' loop at index " + forStartIndex + " is VALID.");
           } else {
-            System.out.println("Syntax of 'for' loop at index " + forStartIndex + " is invalid.");
+            System.out.println("\n== Syntax of 'for' loop at index " + forStartIndex + " is INVALID.");
             break; // Exit if any syntax error is encountered
           }
         } else {
