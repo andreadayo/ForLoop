@@ -30,7 +30,7 @@ public class ForLoop {
     // System.out.print("Enter syntax: ");
     // String syntaxInput = scan.nextLine();
 
-    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { a=1 ; a++ }";
+    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a++ ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } }";
 
     // Split the input into an array and pass to tokenizer()
     String[] arrayInput = syntaxInput.trim().split("\\s+");
@@ -398,7 +398,7 @@ public class ForLoop {
       String currentToken = token[i];
       line.add(currentToken);
 
-      if (currentToken.equals(";") || !line.isEmpty()) {
+      if (currentToken.equals(";") && !line.isEmpty()) {
         if (line.get(0).equals("int")
             || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
           if (checkVarDeclare(token, start, i)) {
