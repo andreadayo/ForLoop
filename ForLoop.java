@@ -6,6 +6,8 @@ import java.util.*;
 
 // SAMPLE3: for ( int i = 0 ; i < length ; ++i ) { int x , y , x ; int var_name = 0 ; a += 0 ; b -= 1 ; ++g ; g-- ; --g ; g++ ; System.out.print ( "hello" ) ; }
 
+// SAMPLE4: for ( int i=0 ; i < length ; ++i ) { a=1 ; }
+
 public class ForLoop {
 
   // Symbols
@@ -117,15 +119,15 @@ public class ForLoop {
       } else if (array[i].contains("=") && array[i].length() >= 3) {
         String[] equalArray = array[i].split("(?<=\\=)|(?=\\=)");
 
-        for (int j = 0; i < equalArray.length; j++) {
+        for (int j = 0; j < equalArray.length; j++) {
           if (equalArray[j].matches("-?\\d+")) {
             tokenList.add("integer");
           } else if (equalArray[j].matches("[a-zA-Z0-9_]+")) {
             tokenList.add("varName");
-          } else if (expOperators.contains(equalArray[j])) {
-            tokenList.add(equalArray[j]);
-          } else if ("=".equals(equalArray[j])) {
+          } else if (equalArray[j].equals("=")) {
             tokenList.add("=");
+          } else {
+            tokenList.add(equalArray[j]);
           }
         }
       } else {
@@ -256,18 +258,22 @@ public class ForLoop {
           if (checkVarDeclare(token, start, i)) {
             content = "varDeclare";
           }
+          System.out.println();
         } else if (line.get(0).equals("update")) {
           if (checkUpdate(token, start, i)) {
             content = "update";
           }
+          System.out.println();
         } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))) {
           if (checkExpression(token, start, i)) {
             content = "expr";
           }
+          System.out.println();
         } else if (line.get(0).equals("varName") && booleanSymbols.contains(line.get(1))) {
           if (checkCondition(token, start, i)) {
             content = "condition";
           }
+          System.out.println();
         }
 
         if (!content.isEmpty()) {
@@ -281,7 +287,7 @@ public class ForLoop {
     if (controlContent.isEmpty()) {
       System.out.println("Control statement is empty");
     } else if (controlContent.size() < 3) {
-      System.out.println("Control statement has less than 3 statements");
+      System.out.println("Control statement has less than 3 correct statements");
     } else if (controlContent.size() == 3) {
       if (controlContent.get(0).equals("varDeclare") &&
           controlContent.get(1).equals("condition") &&
@@ -290,7 +296,7 @@ public class ForLoop {
         validConditionMet = true;
       }
     } else if (controlContent.size() > 3) {
-      System.out.println("Control statement has more than 3 statements");
+      System.out.println("Control statement has more than 3 correct statements");
     }
 
     if (!validConditionMet) {
@@ -332,7 +338,7 @@ public class ForLoop {
             validConditionMet = true;
           }
         }
-        System.out.println(line);
+        System.out.println(": " + line);
         start = i + 1;
         line.clear();
       }
@@ -360,19 +366,19 @@ public class ForLoop {
             if (token[i].equals(",")) {
               i++;
             } else if (token[i].equals(";")) {
-              System.out.println("Correct Identifier List Declaration");
+              System.out.print("Correct Identifier List Declaration");
               return true;
             } else {
-              System.out.println("Incorrect Identifier List Declaration");
+              System.out.print("Incorrect Identifier List Declaration");
               return false;
             }
           } else {
             // Invalid ending, return false
-            System.out.println("Incorrect Identifier List Declaration");
+            System.out.print("Incorrect Identifier List Declaration");
             return false;
           }
         } else {
-          System.out.println("Incorrect Identifier List Declaration");
+          System.out.print("Incorrect Identifier List Declaration");
           return false;
         }
       }
@@ -388,7 +394,7 @@ public class ForLoop {
                   || token[i + 3].equals("integer"))
               &&
               token[i + 4].equals(";")) {
-            System.out.println("Correct Variable Declaration");
+            System.out.print("Correct Variable Declaration");
             return true;
           }
         }
@@ -399,14 +405,14 @@ public class ForLoop {
                   || token[i + 2].equals("integer"))
               &&
               token[i + 3].equals(";")) {
-            System.out.println("Correct Variable Declaration");
+            System.out.print("Correct Variable Declaration");
             return true;
           }
         }
       }
     }
 
-    System.out.println("Incorrect variable declaration");
+    System.out.print("Incorrect variable declaration");
     return false;
   }
 
@@ -414,11 +420,11 @@ public class ForLoop {
   public static boolean checkUpdate(String[] token, int start, int end) {
     for (int i = start; i <= end - 1; i++) {
       if (token[i].equals("update")) {
-        System.out.println("Correct Update");
+        System.out.print("Correct Update");
         return true;
       }
     }
-    System.out.println("Incorrect Update");
+    System.out.print("Incorrect Update");
     return false;
   }
 
@@ -440,10 +446,10 @@ public class ForLoop {
         (booleanSymbols.contains(token[startIndex + 1])) &&
         // make sure that the right side is either a variable or an integer
         (token[startIndex + 2].equals("varName") || token[startIndex + 2].equals("integer"))) {
-      System.out.println("Correct Condition");
+      System.out.print("Correct Condition");
       return true;
     } else {
-      System.out.println("Inorrect Condition");
+      System.out.print("Inorrect Condition");
       return false;
     }
 
@@ -457,11 +463,11 @@ public class ForLoop {
     for (int i = start; i < end; i++) {
       if (token[i].equals("varName") && expOp.contains(token[i + 1]) &&
           (token[i + 2].equals("integer") || token[i + 2].equals("varName")) && token[i + 3].equals(";")) {
-        System.out.println("Correct Expression");
+        System.out.print("Correct Expression");
         return true;
       }
     }
-    System.out.println("Incorrect Expression");
+    System.out.print("Incorrect Expression");
     return false;
   }
 
@@ -474,11 +480,11 @@ public class ForLoop {
           token[i + 2].equals("printContent") &&
           token[i + 3].equals(")") &&
           token[i + 4].equals(";")) {
-        System.out.println("Correct Print Statement");
+        System.out.print("Correct Print Statement");
         return true;
       }
     }
-    System.out.println("Incorrect Print Statement");
+    System.out.print("Incorrect Print Statement");
     return false;
   }
 }
