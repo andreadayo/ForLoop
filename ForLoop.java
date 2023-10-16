@@ -10,7 +10,9 @@ import java.util.*;
 
 // NESTED: for ( int i=0 ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a=1 ; } }
 
-// NESTED: for ( int i=0 ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a++ ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } }
+// NESTED: for ( int i=0 ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a++ ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } a++ ; for ( int i=0 ; i < length ; ++i ) { a += 1 ; } }
+
+// NESTED: for ( int i=0 ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a++ ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } }
 
 public class ForLoop {
 
@@ -30,7 +32,7 @@ public class ForLoop {
     // System.out.print("Enter syntax: ");
     // String syntaxInput = scan.nextLine();
 
-    String syntaxInput = "for ( a++ ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a++ ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } a++ ; }";
+    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { for ( int i=0 ; i < length ; ++i ) { a++ ; } a+=3 ; a=1 ; b++ ; }";
 
     // Split the input into an array and pass to tokenizer()
     String[] arrayInput = syntaxInput.trim().split("\\s+");
@@ -303,7 +305,7 @@ public class ForLoop {
       System.out.println("Correct for () {} Sequence");
       return true;
     } else {
-      System.out.println("Incorrect for () {} Sequence");
+      System.err.println("Incorrect for () {} Sequence");
       errorCounter++;
       return false;
     }
@@ -353,10 +355,10 @@ public class ForLoop {
 
     if (controlContent.isEmpty()) {
       errorCounter++;
-      System.out.println("Control statement is empty");
+      System.err.println("Control statement is empty");
     } else if (controlContent.size() < 3) {
       errorCounter++;
-      System.out.println("Control statement has less than 3 correct statements");
+      System.err.println("Control statement has less than 3 correct statements");
     } else if (controlContent.size() == 3) {
       if (controlContent.get(0).equals("varDeclare") &&
           controlContent.get(1).equals("condition") &&
@@ -366,12 +368,12 @@ public class ForLoop {
       }
     } else if (controlContent.size() > 3) {
       errorCounter++;
-      System.out.println("Control statement has more than 3 correct statements");
+      System.err.println("Control statement has more than 3 correct statements");
     }
 
     if (!validConditionMet) {
       errorCounter++;
-      System.out.println("Illegal control statement");
+      System.err.println("Illegal control statement");
     }
 
     return validConditionMet;
@@ -403,10 +405,10 @@ public class ForLoop {
             checkPrint(token, start, i);
           } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))) {
             checkExpression(token, start, i);
-          } else if (line.get(0).equals("for")) {
-            System.out.print("Correct for loop");
+          } else if (line.get(0).equals("}")) {
+            System.out.print("Nested for loop found");
           } else {
-            System.out.print("Statement not found");
+            System.err.print("Statement not found");
             validConditionMet = false;
             errorCounter++;
           }
@@ -420,7 +422,7 @@ public class ForLoop {
 
     if (!validConditionMet) {
       errorCounter++;
-      System.out.println("Illegal statement");
+      System.err.println("Illegal statement");
     }
 
     return validConditionMet;
@@ -443,18 +445,18 @@ public class ForLoop {
               System.out.print("Correct Identifier List Declaration");
               return true;
             } else {
-              System.out.print("Incorrect Identifier List Declaration");
+              System.err.print("Incorrect Identifier List Declaration");
               errorCounter++;
               return false;
             }
           } else {
             // Invalid ending, return false
-            System.out.print("Incorrect Identifier List Declaration");
+            System.err.print("Incorrect Identifier List Declaration");
             errorCounter++;
             return false;
           }
         } else {
-          System.out.print("Incorrect Identifier List Declaration");
+          System.err.print("Incorrect Identifier List Declaration");
           errorCounter++;
           return false;
         }
@@ -471,7 +473,7 @@ public class ForLoop {
                   || token[i + 3].equals("integer"))
               &&
               token[i + 4].equals(";")) {
-            System.out.print("Correct Variable Declaration");
+            System.out.print("Correct Variable Declaration with Int Data Type");
             return true;
           }
         }
@@ -489,7 +491,7 @@ public class ForLoop {
       }
     }
 
-    System.out.print("Incorrect variable declaration");
+    System.err.print("Incorrect variable declaration");
     errorCounter++;
     return false;
   }
@@ -502,7 +504,7 @@ public class ForLoop {
         return true;
       }
     }
-    System.out.print("Incorrect Update");
+    System.err.print("Incorrect Update");
     errorCounter++;
     return false;
   }
@@ -546,7 +548,7 @@ public class ForLoop {
         return true;
       }
     }
-    System.out.print("Incorrect Expression");
+    System.err.print("Incorrect Expression");
     errorCounter++;
     return false;
   }
@@ -564,7 +566,7 @@ public class ForLoop {
         return true;
       }
     }
-    System.out.print("Incorrect Print Statement");
+    System.err.print("Incorrect Print Statement");
     errorCounter++;
     return false;
   }
