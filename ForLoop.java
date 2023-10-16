@@ -30,7 +30,7 @@ public class ForLoop {
     // System.out.print("Enter syntax: ");
     // String syntaxInput = scan.nextLine();
 
-    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a++ ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } }";
+    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { a=1 ; 123 ; a++ ; a+=2 ; }";
 
     // Split the input into an array and pass to tokenizer()
     String[] arrayInput = syntaxInput.trim().split("\\s+");
@@ -392,34 +392,36 @@ public class ForLoop {
 
     ArrayList<String> line = new ArrayList<>();
     int i = start;
-    boolean validConditionMet = false;
+    boolean validConditionMet = true;
 
     while (i < end) {
       String currentToken = token[i];
       line.add(currentToken);
 
-      if (currentToken.equals(";") && !line.isEmpty()) {
-        if (line.get(0).equals("int")
-            || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
-          if (checkVarDeclare(token, start, i)) {
-            validConditionMet = true;
+      if (currentToken.equals(";") || currentToken.equals("}") || i == end - 1) {
+        // Process the statement when a semicolon, closing brace, or end of the block is
+        // encountered
+        if (!line.isEmpty()) {
+          if (line.get(0).equals("int")
+              || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
+            checkVarDeclare(token, start, i);
+          } else if (line.get(0).equals("update") && line.get(line.size() - 1).contains(";")) {
+            checkUpdate(token, start, i);
+          } else if (line.get(0).equals("print")) {
+            checkPrint(token, start, i);
+          } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))) {
+            checkExpression(token, start, i);
+          } else if (line.get(0).equals("for")) {
+            System.out.print("Correct for loop");
+          } else {
+            System.out.print("Statement not found");
+            validConditionMet = false;
+            errorCounter++;
           }
-        } else if (line.get(0).equals("update") && line.get(line.size() - 1).contains(";")) {
-          if (checkUpdate(token, start, i)) {
-            validConditionMet = true;
-          }
-        } else if (line.get(0).equals("print")) {
-          if (checkPrint(token, start, i)) {
-            validConditionMet = true;
-          }
-        } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))) {
-          if (checkExpression(token, start, i)) {
-            validConditionMet = true;
-          }
+          System.out.println(": " + line);
+          start = i + 1;
+          line.clear();
         }
-        System.out.println(": " + line);
-        start = i + 1;
-        line.clear();
       }
       i++;
     }
