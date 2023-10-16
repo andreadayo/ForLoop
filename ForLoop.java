@@ -30,7 +30,7 @@ public class ForLoop {
     // System.out.print("Enter syntax: ");
     // String syntaxInput = scan.nextLine();
 
-    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { a=1 ; 123 ; a++ ; a+=2 ; }";
+    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { a=1 ; 123 ; a++ ; a+=2 ; System.out.print ( 'hello' ) ; }";
 
     // Split the input into an array and pass to tokenizer()
     String[] arrayInput = syntaxInput.trim().split("\\s+");
