@@ -8,6 +8,10 @@ import java.util.*;
 
 // SAMPLE4: for ( int i=0 ; i < length ; ++i ) { a=1 ; }
 
+// NESTED: for ( int i=0 ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a=1 ; } }
+
+// NESTED: for ( int i=0 ; i < length ; ++i ) { a=1 ; for ( int i=0 ; i < length ; ++i ) { a++ ; } for ( int i=0 ; i < length ; ++i ) { a += 1 ; } }
+
 public class ForLoop {
 
   // Symbols
@@ -18,48 +22,120 @@ public class ForLoop {
   // Operators
   static Set<String> expOperators = new HashSet<>(Arrays.asList("+=", "-=", "*=", "/=", "%="));
 
+  static int errorCounter = 0;
+
   public static void main(String[] args) {
     // Read syntax input
-    Scanner scan = new Scanner(System.in);
-    System.out.print("Enter syntax: ");
-    String syntaxInput = scan.nextLine();
+    // Scanner scan = new Scanner(System.in);
+    // System.out.print("Enter syntax: ");
+    // String syntaxInput = scan.nextLine();
+
+    String syntaxInput = "for ( int i=0 ; i < length ; ++i ) { a=1 ; a++ }";
 
     // Split the input into an array and pass to tokenizer()
     String[] arrayInput = syntaxInput.trim().split("\\s+");
     String[] token = tokenizer(arrayInput);
 
+    System.out.println("Input: " + syntaxInput);
     System.out.println("\n" + Arrays.toString(token));
 
-    System.out.println("\nChecking sequence...");
-    if (checkSequence(token)) {
-      // Check Control Statement ()
-      int startControl = -1;
-      int endControl = -1;
+    // Count how many "for" exists
+    int forCounter = 0;
+    int tokenCounter = 0;
+    ArrayList<Integer> forIndex = new ArrayList<>();
+    for (String word : token) {
+      if (word.equals("for")) {
+        forCounter++;
+        forIndex.add(tokenCounter);
+      }
+      tokenCounter++;
+    }
 
-      for (int i = 0; i < token.length; i++) {
-        if (token[i].equals("(") && startControl == -1) {
-          startControl = i;
-        } else if (token[i].equals(")") && endControl == -1) {
-          endControl = i;
+    /*
+     * System.out.println("For Counter: " + forCounter);
+     * for (int counter : forIndex) {
+     * System.out.println("For Index: " + counter);
+     * }
+     */
+
+    // Ensure forIndex is not empty
+    if (!forIndex.isEmpty()) {
+      for (int i = forIndex.size() - 1; i >= 0; i--) {
+        int forStartIndex = forIndex.get(i);
+        int forEndIndex = -1; // Initialize the end index to -1
+
+        // Find the corresponding closing "}" for the current "for"
+        int openBraces = 0;
+        for (int j = forStartIndex; j < token.length; j++) {
+          if (token[j].equals("{")) {
+            openBraces++;
+          } else if (token[j].equals("}")) {
+            openBraces--;
+            if (openBraces == 0) {
+              forEndIndex = j;
+              break; // Found the matching closing brace
+            }
+          }
+        }
+
+        // Check the syntax of the "for" loop
+        if (forEndIndex != -1) {
+          System.out.println("\nChecking sequence...");
+
+          // Print the "for" loop statement
+          System.out.print("For Loop Statement: ");
+          for (int k = forStartIndex; k <= forEndIndex; k++) {
+            System.out.print(token[k] + " ");
+          }
+          System.out.println();
+
+          if (checkSequence(token)) {
+            // Check Control Statement ()
+            int startControl = -1;
+            int endControl = -1;
+
+            for (int n = forStartIndex; n <= forEndIndex; n++) {
+              if (token[n].equals("(") && startControl == -1) {
+                startControl = n;
+              } else if (token[n].equals(")") && endControl == -1) {
+                endControl = n;
+              }
+            }
+
+            System.out.println("\nChecking control statements...");
+            checkControl(token, startControl, endControl);
+
+            // Check For Loop Statement {}
+            int startStatement = 0, endStatement = 0;
+
+            for (int j = forStartIndex; j <= forEndIndex; j++) {
+              if (token[j].equals("{")) {
+                startStatement = j;
+              } else if (token[j].equals("}")) {
+                endStatement = j;
+              }
+            }
+
+            System.out.println("\nChecking statements...");
+            checkStatement(token, startStatement, endStatement);
+          }
+
+          boolean isSyntaxValid = true;
+          if (errorCounter > 0) {
+            isSyntaxValid = false;
+          }
+
+          if (isSyntaxValid) {
+            System.out.println("Syntax of 'for' loop at index " + forStartIndex + " is valid.");
+          } else {
+            System.out.println("Syntax of 'for' loop at index " + forStartIndex + " is invalid.");
+            break; // Exit if any syntax error is encountered
+          }
+        } else {
+          System.out.println("Error: Missing closing '}' for 'for' loop at index " + forStartIndex);
+          break; // Exit if a missing closing brace is encountered
         }
       }
-
-      System.out.println("\nChecking control statements...");
-      checkControl(token, startControl, endControl);
-
-      // Check For Loop Statement {}
-      int startStatement = 0, endStatement = 0;
-
-      for (int i = 0; i < token.length; i++) {
-        if (token[i].equals("{")) {
-          startStatement = i;
-        } else if (token[i].equals("}")) {
-          endStatement = i;
-        }
-      }
-
-      System.out.println("\nChecking statements...");
-      checkStatement(token, startStatement, endStatement);
     }
   }
 
@@ -131,6 +207,7 @@ public class ForLoop {
           }
         }
       } else {
+        errorCounter++;
         tokenList.add("illegal");
       }
     }
@@ -235,6 +312,7 @@ public class ForLoop {
       return true;
     } else {
       System.out.println("Incorrect for () {} Sequence");
+      errorCounter++;
       return false;
     }
   }
@@ -258,35 +336,34 @@ public class ForLoop {
           if (checkVarDeclare(token, start, i)) {
             content = "varDeclare";
           }
-          System.out.println();
         } else if (line.get(0).equals("update")) {
           if (checkUpdate(token, start, i)) {
             content = "update";
           }
-          System.out.println();
         } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))) {
           if (checkExpression(token, start, i)) {
             content = "expr";
           }
-          System.out.println();
         } else if (line.get(0).equals("varName") && booleanSymbols.contains(line.get(1))) {
           if (checkCondition(token, start, i)) {
             content = "condition";
           }
-          System.out.println();
         }
 
         if (!content.isEmpty()) {
           controlContent.add(content);
         }
+        System.out.println(": " + line);
         start = i + 1;
         line.clear();
       }
     }
 
     if (controlContent.isEmpty()) {
+      errorCounter++;
       System.out.println("Control statement is empty");
     } else if (controlContent.size() < 3) {
+      errorCounter++;
       System.out.println("Control statement has less than 3 correct statements");
     } else if (controlContent.size() == 3) {
       if (controlContent.get(0).equals("varDeclare") &&
@@ -296,10 +373,12 @@ public class ForLoop {
         validConditionMet = true;
       }
     } else if (controlContent.size() > 3) {
+      errorCounter++;
       System.out.println("Control statement has more than 3 correct statements");
     }
 
     if (!validConditionMet) {
+      errorCounter++;
       System.out.println("Illegal control statement");
     }
 
@@ -319,7 +398,7 @@ public class ForLoop {
       String currentToken = token[i];
       line.add(currentToken);
 
-      if (currentToken.equals(";") && !line.isEmpty()) {
+      if (currentToken.equals(";") || !line.isEmpty()) {
         if (line.get(0).equals("int")
             || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
           if (checkVarDeclare(token, start, i)) {
@@ -346,6 +425,7 @@ public class ForLoop {
     }
 
     if (!validConditionMet) {
+      errorCounter++;
       System.out.println("Illegal statement");
     }
 
@@ -370,15 +450,18 @@ public class ForLoop {
               return true;
             } else {
               System.out.print("Incorrect Identifier List Declaration");
+              errorCounter++;
               return false;
             }
           } else {
             // Invalid ending, return false
             System.out.print("Incorrect Identifier List Declaration");
+            errorCounter++;
             return false;
           }
         } else {
           System.out.print("Incorrect Identifier List Declaration");
+          errorCounter++;
           return false;
         }
       }
@@ -413,6 +496,7 @@ public class ForLoop {
     }
 
     System.out.print("Incorrect variable declaration");
+    errorCounter++;
     return false;
   }
 
@@ -425,6 +509,7 @@ public class ForLoop {
       }
     }
     System.out.print("Incorrect Update");
+    errorCounter++;
     return false;
   }
 
@@ -468,6 +553,7 @@ public class ForLoop {
       }
     }
     System.out.print("Incorrect Expression");
+    errorCounter++;
     return false;
   }
 
@@ -485,6 +571,7 @@ public class ForLoop {
       }
     }
     System.out.print("Incorrect Print Statement");
+    errorCounter++;
     return false;
   }
 }
