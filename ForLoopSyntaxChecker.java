@@ -336,7 +336,7 @@ public class ForLoopSyntaxChecker {
     } else if (controlContent.size() == 3) {
       if (controlContent.get(0).equals("varDeclare") &&
           controlContent.get(1).equals("condition") &&
-          controlContent.get(2).equals("update")) {
+          (controlContent.get(2).equals("update") || controlContent.get(2).equals("expr"))) {
         System.out.println("Correct control statements");
         validConditionMet = true;
       }
@@ -371,11 +371,11 @@ public class ForLoopSyntaxChecker {
           if (line.get(0).equals("int")
               || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
             checkVarDeclare(token, start, i);
-          } else if (line.get(0).equals("update") && line.get(line.size() - 1).contains(";")) {
+          } else if ((line.get(0).equals("update")||line.get(0).equals("expr")) && line.get(line.size() - 1).contains(";")) {
             checkUpdate(token, start, i);
           } else if (line.get(0).equals("print")) {
             checkPrint(token, start, i);
-          } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))) {
+          } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))&& line.get(line.size() - 1).contains(";")) {
             checkExpression(token, start, i);
           } else if (line.get(0).equals("}")) {
             System.out.println("Nested for loop found");
@@ -514,8 +514,8 @@ public class ForLoopSyntaxChecker {
 
     for (int i = start; i < end; i++) {
       if (token[i].equals("varName") && expOp.contains(token[i + 1]) &&
-          (token[i + 2].equals("integer") || token[i + 2].equals("varName")) && token[i + 3].equals(";")) {
-        System.out.println("Correct Expression");
+          (token[i + 2].equals("integer") || token[i + 2].equals("varName"))) {
+        System.out.println("Correct Expression"); //&& token[i + 3].equals(";")
         return true;
       }
     }
@@ -530,7 +530,7 @@ public class ForLoopSyntaxChecker {
     for (int i = start; i <= end - 1; i++) {
       if (token[i].equals("print") &&
           token[i + 1].equals("(") &&
-          token[i + 2].equals("printContent") &&
+          (token[i + 2].equals("printContent")||token[i + 2].equals("varName")) &&
           token[i + 3].equals(")") &&
           token[i + 4].equals(";")) {
         System.out.println("Correct Print Statement");
