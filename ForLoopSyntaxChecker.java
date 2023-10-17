@@ -327,19 +327,37 @@ public class ForLoopSyntaxChecker {
       }
     }
 
+    if (controlContent.size() == 3) {
+      int controlCounter = 0;
+      if (controlContent.get(0).equals("varDeclare")) {
+        controlCounter++;
+        System.out.println("Correct for loop initialization");
+      } else {
+        System.err.println("Incorrect for loop initialization");
+      }
+      if (controlContent.get(1).equals("condition")) {
+        controlCounter++;
+        System.out.println("Correct for loop condition");
+      } else {
+        System.err.println("Incorrect for loop condition");
+      }
+      if (controlContent.get(2).equals("update") || controlContent.get(2).equals("expr")) {
+        controlCounter++;
+        System.out.println("Correct for loop update");
+      } else {
+        System.err.println("Incorrect for loop update");
+      }
+      if (controlCounter == 3) {
+        validConditionMet = true;
+        System.out.println("Correct control statements");
+      }
+    }
     if (controlContent.isEmpty()) {
       errorCounter++;
       System.err.println("Control statement is empty");
     } else if (controlContent.size() < 3) {
       errorCounter++;
       System.err.println("Control statement has less than 3 correct statements");
-    } else if (controlContent.size() == 3) {
-      if (controlContent.get(0).equals("varDeclare") &&
-          controlContent.get(1).equals("condition") &&
-          (controlContent.get(2).equals("update") || controlContent.get(2).equals("expr"))) {
-        System.out.println("Correct control statements");
-        validConditionMet = true;
-      }
     } else if (controlContent.size() > 3) {
       errorCounter++;
       System.err.println("Control statement has more than 3 correct statements");
@@ -370,13 +388,31 @@ public class ForLoopSyntaxChecker {
         if (!line.isEmpty()) {
           if (line.get(0).equals("int")
               || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
-            checkVarDeclare(token, start, i);
-          } else if ((line.get(0).equals("update")||line.get(0).equals("expr")) && line.get(line.size() - 1).contains(";")) {
-            checkUpdate(token, start, i);
+            if (checkVarDeclare(token, start, i)) {
+              System.out.println("Correct update");
+            } else {
+              System.err.println("Incorrect update");
+            }
+          } else if ((line.get(0).equals("update") || line.get(0).equals("expr"))
+              && line.get(line.size() - 1).contains(";")) {
+            if (checkUpdate(token, start, i)) {
+              System.out.println("Correct update");
+            } else {
+              System.err.println("Incorrect update");
+            }
           } else if (line.get(0).equals("print")) {
-            checkPrint(token, start, i);
-          } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))&& line.get(line.size() - 1).contains(";")) {
-            checkExpression(token, start, i);
+            if (checkPrint(token, start, i)) {
+              System.out.println("Correct print statement");
+            } else {
+              System.err.println("Incorrect print statement");
+            }
+          } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))
+              && line.get(line.size() - 1).contains(";")) {
+            if (checkExpression(token, start, i)) {
+              System.out.println("Correct expression");
+            } else {
+              System.err.println("Incorrect expression");
+            }
           } else if (line.get(0).equals("}")) {
             System.out.println("Nested for loop found");
           } else {
@@ -413,16 +449,16 @@ public class ForLoopSyntaxChecker {
             if (token[i].equals(",")) {
               i++;
             } else if (token[i].equals(";")) {
-              System.out.println("Correct Identifier List Declaration");
+              // System.out.println("Correct Identifier List Declaration");
               return true;
             } else {
-              System.err.println("Incorrect Identifier List Declaration");
+              // System.err.println("Incorrect Identifier List Declaration");
               errorCounter++;
               return false;
             }
           } else {
             // Invalid ending, return false
-            System.err.println("Incorrect Identifier List Declaration");
+            // System.err.println("Incorrect Identifier List Declaration");
             errorCounter++;
             return false;
           }
@@ -444,7 +480,7 @@ public class ForLoopSyntaxChecker {
                   || token[i + 3].equals("integer"))
               &&
               token[i + 4].equals(";")) {
-            System.out.println("Correct Variable Declaration with Int Data Type");
+            // System.out.println("Correct Variable Declaration with Int Data Type");
             return true;
           }
         }
@@ -455,14 +491,14 @@ public class ForLoopSyntaxChecker {
                   || token[i + 2].equals("integer"))
               &&
               token[i + 3].equals(";")) {
-            System.out.println("Correct Variable Declaration");
+            // System.out.println("Correct Variable Declaration");
             return true;
           }
         }
       }
     }
 
-    System.err.println("Incorrect variable declaration");
+    // System.err.println("Incorrect variable declaration");
     errorCounter++;
     return false;
   }
@@ -471,11 +507,11 @@ public class ForLoopSyntaxChecker {
   public static boolean checkUpdate(String[] token, int start, int end) {
     for (int i = start; i <= end - 1; i++) {
       if (token[i].equals("update")) {
-        System.out.println("Correct Update");
+        // System.out.println("Correct Update");
         return true;
       }
     }
-    System.err.println("Incorrect Update");
+    // System.err.println("Incorrect Update");
     errorCounter++;
     return false;
   }
@@ -498,10 +534,10 @@ public class ForLoopSyntaxChecker {
         (booleanSymbols.contains(token[startIndex + 1])) &&
         // make sure that the right side is either a variable or an integer
         (token[startIndex + 2].equals("varName") || token[startIndex + 2].equals("integer"))) {
-      System.out.println("Correct Condition");
+      // System.out.println("Correct Condition");
       return true;
     } else {
-      System.err.println("Incorrect Condition");
+      // System.err.println("Incorrect Condition");
       return false;
     }
 
@@ -515,11 +551,11 @@ public class ForLoopSyntaxChecker {
     for (int i = start; i < end; i++) {
       if (token[i].equals("varName") && expOp.contains(token[i + 1]) &&
           (token[i + 2].equals("integer") || token[i + 2].equals("varName"))) {
-        System.out.println("Correct Expression"); //&& token[i + 3].equals(";")
+        // System.out.println("Correct Expression"); // && token[i + 3].equals(";")
         return true;
       }
     }
-    System.err.println("Incorrect Expression");
+    // System.err.println("Incorrect Expression");
     errorCounter++;
     return false;
   }
@@ -530,14 +566,14 @@ public class ForLoopSyntaxChecker {
     for (int i = start; i <= end - 1; i++) {
       if (token[i].equals("print") &&
           token[i + 1].equals("(") &&
-          (token[i + 2].equals("printContent")||token[i + 2].equals("varName")) &&
+          (token[i + 2].equals("printContent") || token[i + 2].equals("varName")) &&
           token[i + 3].equals(")") &&
           token[i + 4].equals(";")) {
-        System.out.println("Correct Print Statement");
+        // System.out.println("Correct Print Statement");
         return true;
       }
     }
-    System.err.println("Incorrect Print Statement");
+    // System.err.println("Incorrect Print Statement");
     errorCounter++;
     return false;
   }
