@@ -389,9 +389,9 @@ public class ForLoopSyntaxChecker {
           if (line.get(0).equals("int")
               || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
             if (checkVarDeclare(token, start, i)) {
-              System.out.println("Correct update");
+              System.out.println("Correct variable declaration");
             } else {
-              System.err.println("Incorrect update");
+              System.err.println("Incorrect variable declaration");
             }
           } else if ((line.get(0).equals("update") || line.get(0).equals("expr"))
               && line.get(line.size() - 1).contains(";")) {
