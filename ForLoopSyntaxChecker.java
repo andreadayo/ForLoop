@@ -429,7 +429,7 @@ public class ForLoopSyntaxChecker {
     String lineString = String.join(" ", line);
 
     if (lineString.endsWith(";") || token[i].equals("for") || i == token.length - 1 || lineString.endsWith("}")) {
-      if (line.get(0).equals("int") && line.size() == 5
+      if (line.get(0).equals("int") && line.size() >= 5
           || (line.get(0).equals("varName") && line.size() == 4 && line.get(1).equals("="))) {
         if (checkVarDeclare(token, start, i)) {
           System.out.println("Correct variable declaration");
@@ -466,6 +466,7 @@ public class ForLoopSyntaxChecker {
           return false;
         }
       }
+
     }
     errorCounter++;
     System.err.println("Statement not found");
@@ -474,9 +475,9 @@ public class ForLoopSyntaxChecker {
 
   // checkVarDeclare(): Validates if the variable declaration is correct
   // It accepts [int] <varName> = <varName>||<integer> ;
+  // or int [varName] , [varName] ... ;
   public static boolean checkVarDeclare(String[] token, int start, int end) {
-    // Identifier List
-    if (end - start > 4 && token[start].equals("int")) {
+    if (end - start >= 4 && token[start].equals("int") && token[start + 2].equals(",")) {
       int i = start + 1;
       while (i < end) {
         if (token[i].equals("varName")) {
@@ -506,12 +507,11 @@ public class ForLoopSyntaxChecker {
 
     // Variable Declaration
     else {
-      if (token[start].equals("int")) {
+      if (token[start].equals("int") && token[start + 1].equals("varName") &&
+          token[start + 2].equals("=")) {
         for (int i = start; i < end; i++) {
-          if (token[i + 1].equals("varName") &&
-              token[i + 2].equals("=") &&
-              (token[i + 3].equals("varName")
-                  || token[i + 3].equals("integer"))
+          if ((token[i + 3].equals("varName")
+              || token[i + 3].equals("integer"))
               &&
               token[i + 4].equals(";")) {
             return true;
