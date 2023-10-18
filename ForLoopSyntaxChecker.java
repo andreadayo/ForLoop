@@ -299,7 +299,7 @@ public class ForLoopSyntaxChecker {
 
       if (i == end || currentToken.equals(";")) {
         String content = "";
-        if (line.get(0).equals("int")
+        if ((line.get(0).equals("int") && line.get(1).equals("varName") && line.get(2).equals("="))
             || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
           if (checkVarDeclare(token, start, i)) {
             content = "varDeclare";
