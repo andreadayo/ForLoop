@@ -398,23 +398,23 @@ public class ForLoopSyntaxChecker {
       if (currentToken.equals("for")) {
         if (!line.isEmpty()) {
           processLine(line, token, start, i); // Process the current line
-          System.out.println("Line: " + line);
+          System.out.println("Statements that don't end in ; Line: " + line);
           line.clear();
         }
         System.out.println("New Line: " + currentToken); // Start a new line
         insideNestedFor = true; // Set the flag when entering a nested for loop
-      } else if (currentToken.equals("{")) {
-        line.add(currentToken);
-      } else if (currentToken.equals("}")) {
-        line.add(currentToken);
-        if (insideNestedFor) {
+        while (!currentToken.equals("}")) {
+          line.add(currentToken);
+          i++; // Move to the next token within the inner loop
+          currentToken = token[i]; // Update currentToken
+        }
+        if (currentToken.equals("}")) {
+          line.add(currentToken);
           insideNestedFor = false; // Clear the flag when exiting a nested for loop
-        } else {
-          processLine(line, token, start, i); // Process the current line
           System.out.println("For Line: " + line);
           line.clear();
         }
-      } else if (currentToken.equals(";") || currentToken.equals("}") || i == end - 1) {
+      } else if (!insideNestedFor && (currentToken.equals(";") || currentToken.equals("}") || i == end - 1)) {
         line.add(currentToken);
         // Process the current line
         processLine(line, token, start, i);
@@ -427,7 +427,9 @@ public class ForLoopSyntaxChecker {
       i++;
     }
 
-    if (!validConditionMet) {
+    if (!validConditionMet)
+
+    {
       errorCounter++;
       System.err.println("Illegal statement");
     }
