@@ -76,13 +76,24 @@ public class ForLoopSyntaxChecker {
             int startStatement = forStartIndex;
             int endStatement = forEndIndex;
 
+            System.out.println("Index: " + startStatement + " " + endStatement);
+
             for (int j = forStartIndex; j <= forEndIndex; j++) {
-              if (token[j].equals("{")) {
+              if (token[j].equals("{") && j > startStatement) {
                 startStatement = j;
-              } else if (token[j].equals("}")) {
-                endStatement = j;
+
+                break; // Exit the loop when the first '{' is found
               }
             }
+            System.out.println("Start : " + startStatement);
+
+            for (int j = forEndIndex; j >= forStartIndex; j--) {
+              if (token[j].equals("}") && j < endStatement) {
+                endStatement = j;
+                break; // Exit the loop when the first '}' is found
+              }
+            }
+            System.out.println("End : " + endStatement);
 
             System.out.println("\nChecking statements...");
             checkStatement(token, startStatement, endStatement);
@@ -379,51 +390,40 @@ public class ForLoopSyntaxChecker {
     ArrayList<String> line = new ArrayList<>();
     int i = start;
     boolean validConditionMet = true;
+    boolean insideNestedFor = false;
 
     while (i < end) {
       String currentToken = token[i];
-      line.add(currentToken);
 
-      if (currentToken.equals(";") || currentToken.equals("}") || i == end - 1) {
+      if (currentToken.equals("for")) {
         if (!line.isEmpty()) {
-          if (line.get(0).equals("int")
-              || (line.get(0).equals("varName") && line.size() >= 3 && line.get(1).equals("="))) {
-            if (checkVarDeclare(token, start, i)) {
-              System.out.println("Correct variable declaration");
-            } else {
-              System.err.println("Incorrect variable declaration");
-            }
-          } else if ((line.get(0).equals("update") || line.get(0).equals("expr"))
-              && line.get(line.size() - 1).contains(";")) {
-            if (checkUpdate(token, start, i)) {
-              System.out.println("Correct update");
-            } else {
-              System.err.println("Incorrect update");
-            }
-          } else if (line.get(0).equals("print")) {
-            if (checkPrint(token, start, i)) {
-              System.out.println("Correct print statement");
-            } else {
-              System.err.println("Incorrect print statement");
-            }
-          } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))
-              && line.get(line.size() - 1).contains(";")) {
-            if (checkExpression(token, start, i)) {
-              System.out.println("Correct expression");
-            } else {
-              System.err.println("Incorrect expression");
-            }
-          } else if (line.get(0).equals("}")) {
-            System.out.println("Nested for loop found");
-          } else {
-            System.err.println("Statement not found");
-            validConditionMet = false;
-            errorCounter++;
-          }
-          start = i + 1;
+          processLine(line, token, start, i); // Process the current line
+          System.out.println("Line: " + line);
           line.clear();
         }
+        System.out.println("New Line: " + currentToken); // Start a new line
+        insideNestedFor = true; // Set the flag when entering a nested for loop
+      } else if (currentToken.equals("{")) {
+        line.add(currentToken);
+      } else if (currentToken.equals("}")) {
+        line.add(currentToken);
+        if (insideNestedFor) {
+          insideNestedFor = false; // Clear the flag when exiting a nested for loop
+        } else {
+          processLine(line, token, start, i); // Process the current line
+          System.out.println("For Line: " + line);
+          line.clear();
+        }
+      } else if (currentToken.equals(";") || currentToken.equals("}") || i == end - 1) {
+        line.add(currentToken);
+        // Process the current line
+        processLine(line, token, start, i);
+        System.out.println("Test Line: " + line);
+        line.clear();
+      } else {
+        line.add(currentToken);
       }
+
       i++;
     }
 
@@ -433,6 +433,54 @@ public class ForLoopSyntaxChecker {
     }
 
     return validConditionMet;
+  }
+
+  // Process a line of tokens
+  private static boolean processLine(List<String> line, String[] token, int start, int i) {
+    // Join the tokens into a single line
+    String lineString = String.join(" ", line);
+
+    if (lineString.endsWith(";") || token[i].equals("for") || i == token.length - 1 || lineString.endsWith("}")) {
+      if (line.get(0).equals("int") && line.size() == 5
+          || (line.get(0).equals("varName") && line.size() == 4 && line.get(1).equals("="))) {
+        if (checkVarDeclare(token, start, i)) {
+          System.out.println("Correct variable declaration");
+          return true;
+        } else {
+          System.err.println("Incorrect variable declaration");
+          return false;
+        }
+      } else if (line.get(0).equals("update")
+          && line.get(line.size() - 1).contains(";") && line.size() == 2) {
+        if (checkUpdate(token, start, i)) {
+          System.out.println("Correct update");
+          return true;
+        } else {
+
+          System.err.println("Incorrect update");
+          return false;
+        }
+      } else if (line.get(0).equals("print") && line.size() == 5) {
+        if (checkPrint(token, start, i)) {
+          System.out.println("Correct print statement");
+          return true;
+        } else {
+          System.err.println("Incorrect print statement");
+          return false;
+        }
+      } else if (line.get(0).equals("varName") && expOperators.contains(line.get(1))
+          && line.get(line.size() - 1).contains(";") && line.size() == 4) {
+        if (checkExpression(token, start, i)) {
+          System.out.println("Correct expression");
+          return true;
+        } else {
+          System.err.println("Incorrect expression");
+          return false;
+        }
+      }
+    }
+    System.err.println("Statement not found");
+    return false;
   }
 
   // checkVarDeclare(): Validates if the variable declaration is correct
