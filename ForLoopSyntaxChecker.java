@@ -76,8 +76,6 @@ public class ForLoopSyntaxChecker {
             int startStatement = forStartIndex;
             int endStatement = forEndIndex;
 
-            System.out.println("Index: " + startStatement + " " + endStatement);
-
             for (int j = forStartIndex; j <= forEndIndex; j++) {
               if (token[j].equals("{") && j > startStatement) {
                 startStatement = j;
@@ -85,15 +83,6 @@ public class ForLoopSyntaxChecker {
                 break; // Exit the loop when the first '{' is found
               }
             }
-            System.out.println("Start : " + startStatement);
-
-            for (int j = forEndIndex; j >= forStartIndex; j--) {
-              if (token[j].equals("}") && j < endStatement) {
-                endStatement = j;
-                break; // Exit the loop when the first '}' is found
-              }
-            }
-            System.out.println("End : " + endStatement);
 
             System.out.println("\nChecking statements...");
             checkStatement(token, startStatement, endStatement);
@@ -398,10 +387,10 @@ public class ForLoopSyntaxChecker {
       if (currentToken.equals("for")) {
         if (!line.isEmpty()) {
           processLine(line, token, start, i); // Process the current line
-          System.out.println("Statements that don't end in ; Line: " + line);
+          // System.out.println("Statements that don't end in ; Line: " + line);
           line.clear();
         }
-        System.out.println("New Line: " + currentToken); // Start a new line
+        System.out.println("Nested for loop found"); // Start a new line
         insideNestedFor = true; // Set the flag when entering a nested for loop
         while (!currentToken.equals("}")) {
           line.add(currentToken);
@@ -411,14 +400,16 @@ public class ForLoopSyntaxChecker {
         if (currentToken.equals("}")) {
           line.add(currentToken);
           insideNestedFor = false; // Clear the flag when exiting a nested for loop
-          System.out.println("For Line: " + line);
+          // System.out.println("For Line: " + line);
           line.clear();
+        } else {
+          line.add(currentToken);
         }
       } else if (!insideNestedFor && (currentToken.equals(";") || currentToken.equals("}") || i == end - 1)) {
         line.add(currentToken);
         // Process the current line
         processLine(line, token, start, i);
-        System.out.println("Test Line: " + line);
+        // System.out.println("Test Line: " + line);
         line.clear();
       } else {
         line.add(currentToken);
@@ -481,6 +472,7 @@ public class ForLoopSyntaxChecker {
         }
       }
     }
+    errorCounter++;
     System.err.println("Statement not found");
     return false;
   }
