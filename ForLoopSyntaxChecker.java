@@ -128,7 +128,7 @@ public class ForLoopSyntaxChecker {
         tokenList.add(array[i]);
       } else if (array[i].matches("-?\\d+")) {
         tokenList.add("integer");
-      } else if (array[i].matches("^^[a-zA-Z][a-zA-Z0-9_]*$")) { // [a-zA-Z0-9_]+
+      } else if (array[i].matches("^^[a-zA-Z][a-zA-Z0-9_]*$")) {
         tokenList.add("varName");
       } else if (array[i].matches(".*[\"'].*")) {
         tokenList.add("printContent");
@@ -141,7 +141,7 @@ public class ForLoopSyntaxChecker {
         for (int j = 0; j < exprArray.length; j++) {
           if (exprArray[j].matches("-?\\d+")) {
             tokenList.add("integer");
-          } else if (exprArray[j].matches("^[a-zA-Z][a-zA-Z0-9_]*$")) { // [a-zA-Z0-9_]+
+          } else if (exprArray[j].matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {
             tokenList.add("varName");
           } else if (expOperators.contains(exprArray[j])) {
             tokenList.add(exprArray[j]);
@@ -154,7 +154,7 @@ public class ForLoopSyntaxChecker {
         for (int j = 0; j < boolArray.length; j++) {
           if (boolArray[j].matches("-?\\d+")) {
             tokenList.add("integer");
-          } else if (boolArray[j].matches("^[a-zA-Z][a-zA-Z0-9_]*$")) { // [a-zA-Z0-9_]+
+          } else if (boolArray[j].matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {
             tokenList.add("varName");
           } else if (booleanSymbols.contains(boolArray[j])) {
             tokenList.add(boolArray[j]);
@@ -166,7 +166,7 @@ public class ForLoopSyntaxChecker {
         for (int j = 0; j < equalArray.length; j++) {
           if (equalArray[j].matches("-?\\d+")) {
             tokenList.add("integer");
-          } else if (equalArray[j].matches("^[a-zA-Z][a-zA-Z0-9_]*$")) { // [a-zA-Z0-9_]+
+          } else if (equalArray[j].matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {
             tokenList.add("varName");
           } else if (equalArray[j].equals("=")) {
             tokenList.add("=");
@@ -571,7 +571,7 @@ public class ForLoopSyntaxChecker {
   }
 
   // checkExpression(): Validates if expression has the correct syntax
-  // It accepts <varName> <expOperator> <digit>||<char> [;]
+  // It accepts <varName> <expOperator> <digit>||<varName> [;]
   public static boolean checkExpression(String[] token, int start, int end) {
     Set<String> expOp = new HashSet<>(Arrays.asList("+=", "-=", "*=", "/=", "%="));
 
